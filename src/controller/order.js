@@ -15,8 +15,17 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   }
 
   const user = await Model.User.findByPk(user_id);
-  if (!user || user.status !== "Approved") {
-    return next(new AppError("User not found or not approved", 403));
+  if (!user) {
+    return next(new AppError("User not found", 403));
+  }
+
+  if (user.status !== "Approved") {
+    return next(
+      new AppError(
+        `Your account is currently '${user.status}'. Please contact support and Approved`,
+        403
+      )
+    );
   }
 
   const warehouseProduct = await Model.WarehouseProduct.findOne({
@@ -54,7 +63,7 @@ exports.getAllOrder = catchAsync(async (req, res, next) => {
   }
 
   const orders = await Model.Order.findAll({
-    where:whereCondition,
+    where: whereCondition,
     limit,
     offset,
     raw: true,
