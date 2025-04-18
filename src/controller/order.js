@@ -3,12 +3,12 @@ const Model = require("../models/index");
 const sequelize = require("../config/database");
 
 exports.createOrder = catchAsync(async (req, res, next) => {
-  const { user_id, product_id, warehouse_id, status } = req.body;
+  const { user_id, product_id, warehouse_id } = req.body;
 
-  if (!user_id || !product_id || !warehouse_id || !status) {
+  if (!user_id || !product_id || !warehouse_id) {
     return next(
       new AppError(
-        "All fields (user_id, product_id, warehouse_id, status) are required",
+        "All fields (user_id, product_id, warehouse_id) are required",
         400
       )
     );
@@ -33,7 +33,6 @@ exports.createOrder = catchAsync(async (req, res, next) => {
     user_id,
     product_id,
     warehouse_id,
-    status,
   });
 
   res.status(201).json({

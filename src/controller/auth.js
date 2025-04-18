@@ -88,7 +88,7 @@ exports.loginUser = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid credentials", 401));
   }
 
-  if (user.status !== "Approved") {
+  if (["Block", "Pending", "Reject"].includes(user.status)) {
     return next(
       new AppError(
         `Your account is currently '${user.status}'. Please contact support.`,

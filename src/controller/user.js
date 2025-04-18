@@ -1,7 +1,7 @@
 const { catchAsync, AppError } = require("../utils/appError");
 const Model = require("../models/index");
 const bcrypt = require("bcryptjs");
-const { isValidatePassword } = require('../utils/validators');
+const { isValidatePassword } = require("../utils/validators");
 
 exports.getAllUser = catchAsync(async (req, res, next) => {
   const page = req.query.page ? parseInt(req.query.page) - 1 : 0;
@@ -83,36 +83,41 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     raw: true,
   });
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return next(new AppError("Incorrect Password", 401));
-  }
-
-  if (!isValidatePassword(password)) {
-    return next(
-      new AppError(
-        "Password must be at least 8 characters long and include at least one number and one special character (e.g., !@#$%^&*)",
-        400
-      )
-    );
-  }
-
   if (!user) {
     return next(new AppError("User not found", 404));
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const updatedData = {};
 
-  await Model.User.update(
-    {
-      first_name,
-      last_name,
-      status,
-      role,
-      password: hashedPassword,
-    },
-    { where: { id } }
-  );
+  if (first_name !== undefined) updatedData.first_name = first_name;
+  if (last_name !== undefined) updatedData.last_name = last_name;
+  if (role !== undefined) updatedData.role = role;
+  if (status !== undefined) updatedData.status = status;
+
+  if (password !== undefined) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return next(new AppError("Incorrect Password", 401));
+    }
+
+    if (!isValidatePassword(password)) {
+      return next(
+        new AppError(
+          "Password must be at least 8 characters long and include at least one number and one special character (e.g., !@#$%^&*)",
+          400
+        )
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    updatedData.password = hashedPassword;
+  }
+
+  if (Object.keys(updatedData).length === 0) {
+    return next(new AppError("No valid fields provided for update", 400));
+  }
+
+  await Model.User.update(updatedData, { where: { id } });
 
   res.status(200).json({
     status: "success",

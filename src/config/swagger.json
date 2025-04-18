@@ -201,14 +201,22 @@
           {
             "in": "body",
             "name": "body",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "object",
+              "required": [
+                "first_name",
+                "last_name",
+                "password",
+                "status",
+                "role"
+              ],
               "properties": {
                 "first_name": { "type": "string" },
                 "last_name": { "type": "string" },
-                "email": { "type": "string" },
-                "phone_number": { "type": "string" }
+                "status": { "type": "string" },
+                "role": { "type": "string" },
+                "password": { "type": "string" }
               }
             }
           }
