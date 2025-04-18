@@ -1,0 +1,691 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Inventory Management API",
+    "description": "A simple and secure Inventory Management REST API built with **Node.js**, **Express**, and **PostgreSQL**",
+    "version": "1.0.0"
+  },
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter your Bearer token in the format **Bearer <token>**"
+    }
+  },
+  "paths": {
+    "/api/v1/auth/register/admin": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register Admin",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "first_name",
+                "last_name",
+                "email",
+                "phone_number",
+                "password"
+              ],
+              "properties": {
+                "first_name": { "type": "string" },
+                "last_name": { "type": "string" },
+                "email": { "type": "string" },
+                "phone_number": { "type": "string" },
+                "password": { "type": "string" },
+                "latitude": { "type": "number" },
+                "longitude": { "type": "number" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Success" },
+          "400": { "description": "Invalid input" },
+          "409": { "description": "Already exists" }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register User",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "first_name",
+                "last_name",
+                "email",
+                "phone_number",
+                "password"
+              ],
+              "properties": {
+                "first_name": { "type": "string" },
+                "last_name": { "type": "string" },
+                "email": { "type": "string" },
+                "phone_number": { "type": "string" },
+                "password": { "type": "string" },
+                "latitude": { "type": "number" },
+                "longitude": { "type": "number" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Success" },
+          "400": { "description": "Invalid input" },
+          "409": { "description": "Already exists" }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login",
+        "description": "Allows a user to log in using either their email or phone number. The user must provide either an email address or a phone number along with their password.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "The user's email address. One of `email` or `phone_number` must be provided for login."
+                },
+                "phone_number": {
+                  "type": "string",
+                  "description": "The user's phone number. One of `email` or `phone_number` must be provided for login."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The password associated with the account."
+                }
+              },
+              "required": ["password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Login successful" },
+          "400": {
+            "description": "Missing credentials, either email or phone number must be provided"
+          },
+          "401": { "description": "Invalid credentials" },
+          "403": { "description": "Account not approved" }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get all users",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "first_name",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "phone_number",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Success" },
+          "400": { "description": "Bad Request" }
+        }
+      }
+    },
+    "/api/v1/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get user by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "User data" },
+          "404": { "description": "User not found" }
+        }
+      },
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Update user by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "first_name": { "type": "string" },
+                "last_name": { "type": "string" },
+                "email": { "type": "string" },
+                "phone_number": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "User updated" },
+          "404": { "description": "User not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete user by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "User deleted" },
+          "404": { "description": "User not found" }
+        }
+      }
+    },
+    "/api/v1/orders": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Get all orders",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "in": "query", "name": "status", "type": "string" },
+          { "in": "query", "name": "page", "type": "integer" },
+          { "in": "query", "name": "limit", "type": "integer" }
+        ],
+        "responses": {
+          "200": { "description": "Success" },
+          "400": { "description": "Bad Request" }
+        }
+      },
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Create order",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["user_id", "product_id", "warehouse_id", "status"],
+              "properties": {
+                "user_id": { "type": "string" },
+                "product_id": { "type": "string" },
+                "warehouse_id": { "type": "string" },
+                "status": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Order created successfully" },
+          "400": { "description": "Bad Request" }
+        }
+      }
+    },
+    "/api/v1/orders/{id}": {
+      "patch": {
+        "tags": ["Orders"],
+        "summary": "Update order by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["status"],
+              "properties": {
+                "status": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Order updated" },
+          "404": { "description": "Order not found" }
+        }
+      },
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Get order by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the order to retrieve"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Order data retrieved successfully" },
+          "404": { "description": "Order not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Orders"],
+        "summary": "Delete order by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the order to delete"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Order deleted successfully" },
+          "404": { "description": "Order not found" }
+        }
+      }
+    },
+    "/api/v1/stocks": {
+      "get": {
+        "tags": ["Stocks"],
+        "summary": "Get all stocks",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "in": "query", "name": "page", "type": "integer" },
+          { "in": "query", "name": "limit", "type": "integer" }
+        ],
+        "responses": {
+          "200": { "description": "Success" },
+          "400": { "description": "Bad Request" }
+        }
+      },
+      "post": {
+        "tags": ["Stocks"],
+        "summary": "Create stock",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["product_id", "warehouse_id", "stock_quantity"],
+              "properties": {
+                "product_id": { "type": "string" },
+                "warehouse_id": { "type": "string" },
+                "stock_quantity": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Stock created successfully" },
+          "400": { "description": "Bad Request" }
+        }
+      }
+    },
+    "/api/v1/stocks/{id}": {
+      "patch": {
+        "tags": ["Stocks"],
+        "summary": "Update stocks by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["stock_quantity"],
+              "properties": {
+                "stock_quantity": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Stock updated" },
+          "404": { "description": "Stock not found" }
+        }
+      },
+      "get": {
+        "tags": ["Stocks"],
+        "summary": "Get stock by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the stock to retrieve"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Stock data retrieved successfully" },
+          "404": { "description": "Stock not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Stocks"],
+        "summary": "Delete stock by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the stock to delete"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Stock deleted successfully" },
+          "404": { "description": "Stock not found" }
+        }
+      }
+    },
+    "/api/v1/products": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get all products",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "in": "query", "name": "page", "type": "integer" },
+          { "in": "query", "name": "limit", "type": "integer" },
+          { "in": "query", "name": "name", "type": "string" },
+          { "in": "query", "name": "price", "type": "integer" },
+          { "in": "query", "name": "stock", "type": "integer" }
+        ],
+        "responses": {
+          "200": { "description": "Success" },
+          "400": { "description": "Bad Request" }
+        }
+      },
+      "post": {
+        "tags": ["Products"],
+        "summary": "Create products",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "name",
+                "description",
+                "price",
+                "stock",
+                "latitude",
+                "longitude"
+              ],
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "price": { "type": "integer" },
+                "stock": { "type": "integer" },
+                "latitude": { "type": "float" },
+                "longitude": { "type": "float" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Product created successfully" },
+          "400": { "description": "Bad Request" }
+        }
+      }
+    },
+    "/api/v1/products/{id}": {
+      "patch": {
+        "tags": ["Products"],
+        "summary": "Update products by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["name", "description", "price", "stock"],
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "price": { "type": "integer" },
+                "stock": { "type": "integer" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": " Product updated" },
+          "404": { "description": "Product not found" }
+        }
+      },
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get product by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the stock to retrieve"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Product data retrieved successfully" },
+          "404": { "description": "Product not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Products"],
+        "summary": "Delete product by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the product to delete"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Product deleted successfully" },
+          "404": { "description": "Product not found" }
+        }
+      }
+    },
+    "/api/v1/warehouses": {
+      "get": {
+        "tags": ["Warehouses"],
+        "summary": "Get all warehouses",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "in": "query", "name": "page", "type": "integer" },
+          { "in": "query", "name": "limit", "type": "integer" },
+          { "in": "query", "name": "name", "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "Success" },
+          "400": { "description": "Bad Request" }
+        }
+      },
+      "post": {
+        "tags": ["Products"],
+        "summary": "Create products",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["name", "address", "latitude", "longitude"],
+              "properties": {
+                "name": { "type": "string" },
+                "address": { "type": "string" },
+                "latitude": { "type": "float" },
+                "longitude": { "type": "float" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Product created successfully" },
+          "400": { "description": "Bad Request" }
+        }
+      }
+    },
+    "/api/v1/warehouses/{id}": {
+      "patch": {
+        "tags": ["Warehouses"],
+        "summary": "Update warehouses by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["name", "address", "longitude", "latitude"],
+              "properties": {
+                "name": { "type": "string" },
+                "address": { "type": "string" },
+                "longitude": { "type": "float" },
+                "latitude": { "type": "float" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": " Warehouse updated" },
+          "404": { "description": "Warehouse not found" }
+        }
+      },
+      "get": {
+        "tags": ["Warehouses"],
+        "summary": "Get warehouse by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the warehouse to retrieve"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Warehouse data retrieved successfully" },
+          "404": { "description": "Warehouse not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Warehouses"],
+        "summary": "Delete warehouse by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the Warehouse to delete"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Warehouse deleted successfully" },
+          "404": { "description": "Warehouse not found" }
+        }
+      }
+    }
+  }
+}
