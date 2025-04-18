@@ -48,13 +48,14 @@ exports.getAllOrder = catchAsync(async (req, res, next) => {
   const limit = req.query.limit ? parseInt(req.query.limit) : 10;
   const offset = page * limit;
 
-  const { status } = req.body;
+  const { status } = req.query;
   const whereCondition = {};
   if (status) {
     whereCondition.status = status;
   }
 
   const orders = await Model.Order.findAll({
+    where:whereCondition,
     limit,
     offset,
     raw: true,

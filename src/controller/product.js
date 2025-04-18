@@ -40,7 +40,7 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
   const limit = req.query.limit ? parseInt(req.query.limit) : 10;
   const offset = page * limit;
 
-  const { name, price, stock } = req.body;
+  const { name, price, stock } = req.query;
   const whereCondition = {};
 
   if (name) {

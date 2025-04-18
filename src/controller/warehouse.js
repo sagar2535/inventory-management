@@ -32,7 +32,7 @@ exports.getAllWarehouses = catchAsync(async (req, res, next) => {
   const limit = req.query.limit ? parseInt(req.query.limit) : 10;
   const offset = page * limit;
 
-  const { name } = req.body;
+  const { name } = req.query;
   const whereCondition = {};
 
   if (name) {

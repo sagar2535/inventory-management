@@ -8,7 +8,7 @@ exports.getAllUser = catchAsync(async (req, res, next) => {
   const limit = req.query.limit ? parseInt(req.query.limit) : 10;
   const offset = page * limit;
 
-  const { first_name, email, phone_number } = req.body;
+  const { first_name, email, phone_number } = req.query;
 
   const whereCondition = {};
   if (first_name) {
