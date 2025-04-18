@@ -6,7 +6,7 @@ router.use(Middleware.Protect);
 
 router.post("/", Controller.OrderController.createOrder);
 
-router.use(Middleware.CheckAdmin)
+router.use(Middleware.CheckAdmin);
 
 router.get("/", Controller.OrderController.getAllOrder);
 router

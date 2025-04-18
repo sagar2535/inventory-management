@@ -270,9 +270,8 @@
             "required": true,
             "schema": {
               "type": "object",
-              "required": ["user_id", "product_id", "warehouse_id"],
+              "required": ["product_id", "warehouse_id"],
               "properties": {
-                "user_id": { "type": "string" },
                 "product_id": { "type": "string" },
                 "warehouse_id": { "type": "string" }
               }

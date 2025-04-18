@@ -3,18 +3,10 @@ const Model = require("../models/index");
 const sequelize = require("../config/database");
 
 exports.createOrder = catchAsync(async (req, res, next) => {
-  const { user_id, product_id, warehouse_id } = req.body;
+  const { product_id, warehouse_id } = req.body;
+  const user_id = req.user;
 
-  if (!user_id || !product_id || !warehouse_id) {
-    return next(
-      new AppError(
-        "All fields (user_id, product_id, warehouse_id) are required",
-        400
-      )
-    );
-  }
-
-  const user = await Model.User.findByPk(user_id);
+  const user = await Model.User.findByPk(user_id?.user.id);
   if (!user) {
     return next(new AppError("User not found", 403));
   }
@@ -22,9 +14,15 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   if (user.status !== "Approved") {
     return next(
       new AppError(
-        `Your account is currently '${user.status}'. Please contact support and Approved`,
+        `Your account is currently '${user.status}'. Only approved users can place orders.`,
         403
       )
+    );
+  }
+
+  if (!product_id || !warehouse_id) {
+    return next(
+      new AppError("All fields (product_id, warehouse_id) are required", 400)
     );
   }
 
@@ -39,7 +37,7 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   }
 
   const newOrder = await Model.Order.create({
-    user_id,
+    user_id: user_id?.user.id,
     product_id,
     warehouse_id,
   });
