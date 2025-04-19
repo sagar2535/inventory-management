@@ -499,8 +499,8 @@
                 "description": { "type": "string" },
                 "price": { "type": "integer" },
                 "stock": { "type": "integer" },
-                "latitude": { "type": "float" },
-                "longitude": { "type": "float" }
+                "latitude": { "type": "integer" },
+                "longitude": { "type": "integer" }
               }
             }
           }
@@ -611,8 +611,8 @@
               "properties": {
                 "name": { "type": "string" },
                 "address": { "type": "string" },
-                "latitude": { "type": "float" },
-                "longitude": { "type": "float" }
+                "latitude": { "type": "integer" },
+                "longitude": { "type": "integer" }
               }
             }
           }
@@ -645,8 +645,8 @@
               "properties": {
                 "name": { "type": "string" },
                 "address": { "type": "string" },
-                "longitude": { "type": "float" },
-                "latitude": { "type": "float" }
+                "longitude": { "type": "integer" },
+                "latitude": { "type": "integer" }
               }
             }
           }

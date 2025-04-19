@@ -105,7 +105,6 @@ exports.loginUser = catchAsync(async (req, res, next) => {
   const loggedInUser = { ...user };
   delete loggedInUser.password;
 
-  console.log(loggedInUser)
   const token = signJwtToken(loggedInUser);
 
   res.status(200).json({

@@ -1,5 +1,6 @@
 const { catchAsync, AppError } = require("../utils/appError");
 const Model = require("../models/index");
+const { Sequelize } = require("sequelize");
 
 exports.createProduct = catchAsync(async (req, res, next) => {
   const { name, description, price, stock, latitude, longitude } = req.body;
@@ -40,21 +41,47 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
   const limit = req.query.limit ? parseInt(req.query.limit) : 10;
   const offset = page * limit;
 
-  const { name, price, stock } = req.query;
-  const whereCondition = {};
+  const { user: { latitude, longitude, status } } = req.user;
 
-  if (name) {
-    whereCondition.name = name;
+  const { name, price, stock } = req.query;
+
+  if (status !== "Approved") {
+    return next(
+      new AppError(
+        `Your account is currently '${status}'. Please contact support.`,
+        403
+      )
+    );
   }
-  if (price) {
-    whereCondition.price = price;
-  }
-  if (stock) {
-    whereCondition.stock = stock;
-  }
+
+  const whereCondition = {};
+  if (name) whereCondition.name = name;
+  if (price) whereCondition.price = price;
+  if (stock) whereCondition.stock = stock;
+
+  const distanceFormula = `
+    6371 * acos(
+      cos(radians(${latitude})) *
+      cos(radians(latitude)) *
+      cos(radians(longitude) - radians(${longitude})) +
+      sin(radians(${latitude})) *
+      sin(radians(latitude))
+    )
+  `;
 
   const products = await Model.Product.findAll({
-    where: whereCondition,
+    attributes: {
+      include: [
+        [Sequelize.literal(distanceFormula), 'distance']
+      ]
+    },
+    where: {
+      ...whereCondition,
+      [Sequelize.Op.and]: [
+        Sequelize.literal(`latitude IS NOT NULL AND longitude IS NOT NULL`)
+      ]
+    },
+    order: Sequelize.literal('distance ASC'),
     limit,
     offset,
     raw: true,
@@ -63,11 +90,18 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
   if (products.length === 0) {
     return next(new AppError("No Products Found", 404));
   }
+  
+  const within10km = products.filter(p => parseFloat(p.distance) <= 10);
+  const beyond10km = products.filter(p => parseFloat(p.distance) > 10);
+  
 
   res.status(200).json({
     status: "success",
-    data: products,
-    message: "Products fetched successfully",
+    message: "Products fetched with distance information",
+    data: {
+      within10km,
+      beyond10km
+    }
   });
 });
 
@@ -131,4 +165,3 @@ exports.deleteProductById = catchAsync(async (req, res, next) => {
     message: "Product deleted successfully",
   });
 });
-

@@ -41,7 +41,6 @@ module.exports = (error, req, res, next) => {
   error.statusCode = error.statusCode || 500;
   error.status = error.status || "Fail";
   error.isOperational = error.isOperational || false;
-  console.log(process.env.NODE_ENV);
   switch (process.env.NODE_ENV) {
     case "devlopment":
       devErrorHandler(error, req, res);
